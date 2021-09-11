@@ -23,3 +23,5 @@ In a normal game of Hog, those are all the rules. To spice up the game, we'll in
         Player 0 rolls 2 dice and gets 6 points. (11, 10)
         Player 1 rolls 8 dice and gets 1 points. Player 1's score doubles. (11, 22)
 
+To play the game:
+run python hog_gui.py

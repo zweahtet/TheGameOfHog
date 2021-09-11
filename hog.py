@@ -115,7 +115,9 @@ def hog_pile(player_score, opponent_score):
     opponent_score: The total score of the other player.
     """
     # BEGIN PROBLEM 4
-    if player_score == opponent_score:  # if current player and other player has the same score
+    # if current player and other player has the same score,
+    # doubles the current player score by returning player_score
+    if player_score == opponent_score:
         return player_score
     else:
         return 0
@@ -169,11 +171,13 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
             score1 += hog_pile(score1, score0)
         # get the number of the next player
         who = next_player(who)
+        # call the commentary function
+        say = say(score0, score1)
 
     # END PROBLEM 5
     # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
     # BEGIN PROBLEM 6
-    "*** YOUR CODE HERE ***"
+
     # END PROBLEM 6
     return score0, score1
 
@@ -251,7 +255,25 @@ def announce_highest(who, last_score=0, running_high=0):
     """
     assert who == 0 or who == 1, 'The who argument should indicate a player.'
     # BEGIN PROBLEM 7
-    "*** YOUR CODE HERE ***"
+
+    def say(score0, score1):
+        # if a particular player is player 0
+        if who == 0:
+            current_high = score0 - last_score
+            if current_high > running_high:
+                print(current_high, "point(s)! That's a record gain for Player 0!")
+                return announce_highest(who, score0, current_high)
+            else:
+                return announce_highest(who, score0, running_high)
+        # if a particular player is player 1
+        elif who == 1:
+            current_high = score1 - last_score
+            if current_high > running_high:
+                print(current_high, "point(s)! That's a record gain for Player 1!")
+                return announce_highest(who, score1, current_high)
+            else:
+                return announce_highest(who, score1, running_high)
+    return say
     # END PROBLEM 7
 
 
@@ -291,7 +313,17 @@ def make_averaged(original_function, trials_count=1000):
     3.0
     """
     # BEGIN PROBLEM 8
-    "*** YOUR CODE HERE ***"
+    # this function should call original_function a total of trials_count
+    # times and return the average of the results of the calls
+    def call_original(*args):
+        count = 0
+        total = 0
+        while count < trials_count:
+            total += original_function(*args)
+            count += 1
+        return total/trials_count
+
+    return call_original
     # END PROBLEM 8
 
 
@@ -305,7 +337,16 @@ def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
     1
     """
     # BEGIN PROBLEM 9
-    "*** YOUR CODE HERE ***"
+    # keep average scores in an array
+    avg_scores = []
+    for num_dice in range(1, 11):
+        current_avg_score = make_averaged(
+            roll_dice, trials_count)(num_dice, dice)
+        avg_scores.append(current_avg_score)
+    # get the max score from the average scores
+    max_score = max(avg_scores)
+    # return the smallest number of dice rolls
+    return avg_scores.index(max_score)+1
     # END PROBLEM 9
 
 
@@ -334,10 +375,12 @@ def run_experiments():
     print('Max scoring num rolls for six-sided dice:', six_sided_max)
     print('always_roll(6) win rate:', average_win_rate(always_roll(6)))
 
-    #print('always_roll(8) win rate:', average_win_rate(always_roll(8)))
-    #print('picky_piggy_strategy win rate:', average_win_rate(picky_piggy_strategy))
+    print('always_roll(8) win rate:', average_win_rate(always_roll(8)))
+    print('picky_piggy_strategy win rate:',
+          average_win_rate(picky_piggy_strategy))
     print('hog_pile_strategy win rate:', average_win_rate(hog_pile_strategy))
-    #print('final_strategy win rate:', average_win_rate(final_strategy))
+    print('final_strategy win rate:', average_win_rate(final_strategy))
+
     "*** You may add additional experiments as you wish ***"
 
 
@@ -346,7 +389,7 @@ def picky_piggy_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     returns NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
-    return 6  # Remove this line once implemented.
+    return num_rolls if picky_piggy(opponent_score) < cutoff else 0
     # END PROBLEM 10
 
 
@@ -356,7 +399,13 @@ def hog_pile_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     Otherwise, it returns NUM_ROLLS.
     """
     # BEGIN PROBLEM 11
-    return 6  # Remove this line once implemented.
+    pp_score = picky_piggy(opponent_score)
+    # will rolling 0 dice trigger the Hog Pile rule?
+    # Or will it at least return a CUTOFF points?
+    if (pp_score + score) == opponent_score or pp_score >= cutoff:
+        return 0
+    else:
+        return num_rolls
     # END PROBLEM 11
 
 
